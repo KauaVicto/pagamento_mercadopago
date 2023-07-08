@@ -1,15 +1,29 @@
 <template>
-  <div class="home">
+  <div class="container">
     <form id="form-checkout">
-      <div id="form-checkout__cardNumber"></div>
-      <div id="form-checkout__expirationDate"></div>
-      <div id="form-checkout__securityCode"></div>
-      <input type="text" id="form-checkout__cardholderName" />
+      <div class="geral">
+        <div class="tabs">
+
+        </div>
+
+        <div class="tab1">
+          <input type="text" id="form-checkout__cardholderName" />
+          <input type="email" id="form-checkout__cardholderEmail" />
+          <select id="form-checkout__identificationType"></select>
+          <input type="text" id="form-checkout__identificationNumber" />
+        </div>
+
+        <div class="tab2">
+          <div id="form-checkout__cardNumber"></div>
+          <div id="form-checkout__expirationDate"></div>
+          <div id="form-checkout__securityCode"></div>
+        </div>
+      </div>
+
+
       <select id="form-checkout__issuer"></select>
       <select id="form-checkout__installments"></select>
-      <select id="form-checkout__identificationType"></select>
-      <input type="text" id="form-checkout__identificationNumber" />
-      <input type="email" id="form-checkout__cardholderEmail" />
+
 
       <button type="submit" id="form-checkout__submit">Pagar</button>
       <progress value="0" class="progress-bar">Carregando...</progress>
@@ -20,12 +34,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { loadMercadoPago } from "@mercadopago/sdk-js";
+import axiosInstance from "@/config/axios";
 
 export default defineComponent({
   name: "PayView",
   async mounted() {
     await loadMercadoPago();
-    const mp = new window.MercadoPago("");
+    const mp = new window.MercadoPago("TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78");
     this.configCardForm(mp);
   },
   methods: {
@@ -81,6 +96,7 @@ export default defineComponent({
           onSubmit: (event: any) => {
             event.preventDefault();
 
+
             const {
               paymentMethodId: payment_method_id,
               issuerId: issuer_id,
@@ -92,12 +108,9 @@ export default defineComponent({
               identificationType,
             } = cardForm.getCardFormData();
 
-            fetch("/process_payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
+            axiosInstance.post(
+              "/process_payment",
+              JSON.stringify({
                 token,
                 issuer_id,
                 payment_method_id,
@@ -112,7 +125,18 @@ export default defineComponent({
                   },
                 },
               }),
-            });
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                }
+              }
+            )
+              .then((response: any) => {
+
+              })
+              .catch((error: any) => {
+                console.log(error)
+              });
           },
           onFetching: (resource: any) => {
             // Buscando
@@ -125,86 +149,17 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Estilos gerais */
 .container {
-  margin-bottom: 10px;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-input[type="text"],
-select,
-button {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-button[type="submit"] {
-  background-color: #4caf50;
-  color: white;
-  cursor: pointer;
-}
-
-.progress-bar {
-  display: block;
-  width: 100%;
-  padding: 10px;
-}
-
-/* Estilos específicos */
-#form-checkout__cardNumber {
-  /* Adicione estilos personalizados para o campo de número do cartão */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__expirationDate {
-  /* Adicione estilos personalizados para o campo de data de validade */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__securityCode {
-  /* Adicione estilos personalizados para o campo de código de segurança */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__cardholderName {
-  /* Adicione estilos personalizados para o campo de nome do titular do cartão */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__issuer {
-  /* Adicione estilos personalizados para o campo de emissor */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__installments {
-  /* Adicione estilos personalizados para o campo de parcelas */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__identificationType {
-  /* Adicione estilos personalizados para o campo de tipo de identificação */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__identificationNumber {
-  /* Adicione estilos personalizados para o campo de número de identificação */
-  background-color: #f2f2f2;
-  padding: 12px;
-}
-
-#form-checkout__cardholderEmail {
-  /* Adicione estilos personalizados para o campo de e-mail do titular do cartão */
-  background-color: #f2f2f2;
-  padding: 12px;
+#form-checkout {
+  width: 50%;
+  min-width: 400px;
+  background-color: rgb(211, 211, 211);
 }
 </style>
