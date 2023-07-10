@@ -8,9 +8,9 @@
             <li>Informações do Cartão</li>
           </ul>
         </div>
-
+        
         <div class="tab1" v-show="showTab1">
-          <input type="text" id="form-checkout__cardholderName" />
+          <InputText id_input="form-checkout__cardholderName" />
           <input type="email" id="form-checkout__cardholderEmail" />
           <select id="form-checkout__identificationType"></select>
           <input type="text" id="form-checkout__identificationNumber" />
@@ -42,9 +42,13 @@
 import { defineComponent } from "vue";
 import { loadMercadoPago } from "@mercadopago/sdk-js";
 import axiosInstance from "@/config/axios";
+import InputText from "@/components/InputText.vue";
 
 export default defineComponent({
   name: "PayView",
+  components: {
+    InputText
+  },
   data() {
     return {
       showTab1: true,
@@ -177,12 +181,14 @@ export default defineComponent({
   padding: 30px;
 }
 
-.tab1 input, .tab1 select {
+input, select {
   padding: 10px;
   width: 100%;
   margin: 5px 0;
   border: none;
   outline: none;
+  position: relative;
+  display: block;
 }
 
 .container {
