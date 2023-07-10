@@ -4,26 +4,24 @@
       <div class="form_pagamento">
         <div class="tabs">
           <ul class="list_tab">
-            <li>Informações Pessoais</li>
-            <li>Informações do Cartão</li>
+            <li v-on:click="showTab=1">Informações Pessoais</li>
+            <li v-on:click="showTab=2">Informações do Cartão</li>
           </ul>
         </div>
         
-        <div class="tab1" v-show="showTab1">
-          <InputText id_input="form-checkout__cardholderName" />
-          <input type="email" id="form-checkout__cardholderEmail" />
+        <div class="tab1" v-show="showTab == 1">
+          <InputField type_input="text" id_input="form-checkout__cardholderName" />
+          <InputField type_input="email" id_input="form-checkout__cardholderEmail" />
           <select id="form-checkout__identificationType"></select>
-          <input type="text" id="form-checkout__identificationNumber" />
+          <InputField type_input="text" id_input="form-checkout__identificationNumber" />
         </div>
-
-        <div class="tab2" v-show="showTab2">
-          <div id="form-checkout__cardNumber"></div>
-          <div id="form-checkout__expirationDate"></div>
-          <div id="form-checkout__securityCode"></div>
+        
+        <div class="tab2" v-show="showTab == 2">
+          <InputField type_input="text" id_input="form-checkout__cardNumber" />
+          <InputField type_input="text" id_input="form-checkout__expirationDate" />
+          <InputField type_input="text" id_input="form-checkout__securityCode" />
         </div>
       </div>
-
-      <div class="divider"></div>
 
       <div class="info_compras">
 
@@ -42,17 +40,16 @@
 import { defineComponent } from "vue";
 import { loadMercadoPago } from "@mercadopago/sdk-js";
 import axiosInstance from "@/config/axios";
-import InputText from "@/components/InputText.vue";
+import InputField from "@/components/InputField.vue";
 
 export default defineComponent({
   name: "PayView",
   components: {
-    InputText
+    InputField
   },
   data() {
     return {
-      showTab1: true,
-      showTab2: false,
+      showTab: 1,
     }
   },
   async mounted() {
@@ -174,7 +171,7 @@ export default defineComponent({
   align-items: center;
 }
 
-.tab1 {
+.tab1, .tab2 {
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -204,14 +201,8 @@ input, select {
 
 .form_pagamento {
   width: 70%;
-}
-
-.divider {
-  border-left: 1px solid gray;
-  width: 0;
-  height: 70%;
-  align-self: center;
-  margin: 0 40px;
+  height: 100%;
+  border-right: 1px solid black;
 }
 
 .list_tab {

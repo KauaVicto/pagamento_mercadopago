@@ -1,6 +1,6 @@
 <template>
     <div class="box-input" v-bind:class="{'foco': focused}">
-        <input type="text" :id="id_input" v-on:focus="focused = true" v-on:blur="focused = false">
+        <input :type="type_input" :id="id_input" v-on:focus="focused = true" v-on:blur="focused = false">
     </div>
 </template>
 
@@ -9,13 +9,13 @@ import { defineComponent } from 'vue';
 
 
 export default defineComponent({
-    name: "InputText",
+    name: "InputField",
     data() {
         return {
             focused: false
         }
     },
-    props: ['id_input']
+    props: ['id_input', 'type_input']
 });
 
 </script>
