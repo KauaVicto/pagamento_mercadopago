@@ -1,34 +1,41 @@
 <template>
-  <div class="container">
-    <form id="form-checkout">
-      <div class="geral">
+  <form id="form-checkout">
+    <div class="container">
+      <div class="form_pagamento">
         <div class="tabs">
-
+          <ul class="list_tab">
+            <li>Informações Pessoais</li>
+            <li>Informações do Cartão</li>
+          </ul>
         </div>
 
-        <div class="tab1">
+        <div class="tab1" v-show="showTab1">
           <input type="text" id="form-checkout__cardholderName" />
           <input type="email" id="form-checkout__cardholderEmail" />
           <select id="form-checkout__identificationType"></select>
           <input type="text" id="form-checkout__identificationNumber" />
         </div>
 
-        <div class="tab2">
+        <div class="tab2" v-show="showTab2">
           <div id="form-checkout__cardNumber"></div>
           <div id="form-checkout__expirationDate"></div>
           <div id="form-checkout__securityCode"></div>
         </div>
       </div>
 
+      <div class="divider"></div>
 
-      <select id="form-checkout__issuer"></select>
-      <select id="form-checkout__installments"></select>
+      <div class="info_compras">
 
+        <select id="form-checkout__issuer"></select>
+        <select id="form-checkout__installments"></select>
+
+      </div>
 
       <button type="submit" id="form-checkout__submit">Pagar</button>
       <progress value="0" class="progress-bar">Carregando...</progress>
-    </form>
-  </div>
+    </div>
+  </form>
 </template>
 
 <script lang="ts">
@@ -38,6 +45,12 @@ import axiosInstance from "@/config/axios";
 
 export default defineComponent({
   name: "PayView",
+  data() {
+    return {
+      showTab1: true,
+      showTab2: false,
+    }
+  },
   async mounted() {
     await loadMercadoPago();
     const mp = new window.MercadoPago("TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78");
@@ -47,7 +60,7 @@ export default defineComponent({
     configCardForm: (mp: any) => {
       const cardForm = mp.cardForm({
         amount: "20",
-        iframe: true,
+        iframe: false,
         form: {
           id: "form-checkout",
           cardNumber: {
@@ -149,7 +162,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.container {
+#form-checkout {
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -157,9 +170,48 @@ export default defineComponent({
   align-items: center;
 }
 
-#form-checkout {
+.tab1 {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 30px;
+}
+
+.tab1 input, .tab1 select {
+  padding: 10px;
+  width: 100%;
+  margin: 5px 0;
+  border: none;
+  outline: none;
+}
+
+.container {
   width: 50%;
-  min-width: 400px;
-  background-color: rgb(211, 211, 211);
+  min-width: 500px;
+  height: 350px;
+  border: 1px solid rgb(7, 163, 59);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.form_pagamento {
+  width: 70%;
+}
+
+.divider {
+  border-left: 1px solid gray;
+  width: 0;
+  height: 70%;
+  align-self: center;
+  margin: 0 40px;
+}
+
+.list_tab {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>
