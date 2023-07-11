@@ -2,7 +2,7 @@
   <form id="form-checkout">
     <div class="container">
       <div class="tabs">
-        <ul class="list_tab" v-bind:class="{ 'active1': showTab==1, 'active2':showTab==2 }">
+        <ul class="list_tab" v-bind:class="{ 'active1': showTab == 1, 'active2': showTab == 2 }">
           <li id="tab_info_pessoal" v-on:click="showTab = 1">Informações Pessoais</li>
           <li id="tab_info_cartao" v-on:click="showTab = 2">Informações do Cartão</li>
         </ul>
@@ -18,7 +18,8 @@
         </div>
 
         <div class="tab2" v-show="showTab == 2">
-          <InputField type_input="text" id_input="form-checkout__cardNumber" v-model="cardNumber" />
+          <InputField type_input="text" id_input="form-checkout__cardNumber"
+            v-on:keyup="keyPressCardNumber($event.target.value)" v-model="cardNumber" />
           <div class="form-group">
             <InputField type_input="text" id_input="form-checkout__expirationDate" />
             <InputField type_input="text" id_input="form-checkout__securityCode" />
@@ -31,17 +32,17 @@
       </div>
 
       <div class="info_cartao">
-        <CartaoComponent :titular="cardholderName" :numero_cartao="formatCardNumber(cardNumber)" />
+        <CartaoComponent :titular="cardholderName" :numero_cartao="formatCardNumber(cardNumber)" :issuer="issuer" />
       </div>
 
       <div class="info_compras">
 
-        
+
         <button type="submit" id="form-checkout__submit">Pagar</button>
 
       </div>
 
-      
+
     </div>
   </form>
 </template>
@@ -50,6 +51,7 @@
 import { defineComponent } from "vue";
 import { loadMercadoPago } from "@mercadopago/sdk-js";
 import axiosInstance from "@/config/axios";
+import axios from "axios";
 import InputField from "@/components/InputField.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
 import CartaoComponent from "@/components/CartaoComponent.vue";
@@ -65,12 +67,14 @@ export default defineComponent({
     return {
       showTab: 1,
       cardholderName: '',
-      cardNumber: ''
+      cardNumber: '',
+      issuer: null,
+      public_key: 'TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78'
     }
   },
   async mounted() {
     await loadMercadoPago();
-    const mp = new window.MercadoPago("TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78");
+    const mp = new window.MercadoPago(this.public_key);
     this.configCardForm(mp);
   },
   methods: {
@@ -170,6 +174,7 @@ export default defineComponent({
           },
           onFetching: (resource: any) => {
             // Buscando
+            console.log('buscando')
           },
         },
       });
@@ -177,10 +182,26 @@ export default defineComponent({
     proximaEtapa: function (e: any) {
       this.showTab = 2
     },
-    formatCardNumber: function(number: string) {
+    formatCardNumber: function (number: string) {
       if (!number) return '';
 
       return number.replace(/(.{4})/g, '$1 ')
+    },
+    keyPressCardNumber: function (value: string) {
+      if (value.length >= 6) {
+        if (!this.issuer) {
+
+          axios.get('https://api.mercadopago.com/v1/payment_methods/installments', { params: { public_key: this.public_key, bin: value } })
+            .then((response) => {
+              this.issuer = response.data[0].payment_method_id;
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        }
+      } else {
+        this.issuer = null
+      }
     }
   }
 });
@@ -204,12 +225,13 @@ export default defineComponent({
   display: grid;
   justify-content: center;
   gap: 10px;
-  grid-template: 
+  grid-template:
     "tabs tabs info_compras" 20%
     "form_pagamento cartao info_compras" auto
     / 40% 30% 25%
 }
-.container > div {
+
+.container>div {
   border-radius: 10px;
   background-color: white;
 }
@@ -221,6 +243,7 @@ export default defineComponent({
 .info_compras {
   grid-area: info_compras;
 }
+
 .form_pagamento {
   grid-area: form_pagamento;
 }
@@ -249,6 +272,7 @@ export default defineComponent({
 .list_tab.active1::after {
   left: 0;
 }
+
 .list_tab.active2::after {
   left: 50%;
 }
@@ -303,7 +327,4 @@ select {
   justify-content: center;
   align-items: stretch;
 }
-
-
-
 </style>

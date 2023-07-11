@@ -2,7 +2,7 @@
     <div class="cartao">
         <p id="text-titular">{{ titular }}</p>
         <p id="numero-cartao">{{ numero_cartao }}</p>
-
+        <img class="issuer" v-show="issuer" :src="issuer" alt="">
     </div>
 </template>
 
@@ -20,6 +20,9 @@ export default defineComponent({
         numero_cartao: {
             type: String,
             default: '**** **** **** ****'
+        },
+        issuer: {
+            type: String
         }
     }
 });
@@ -37,9 +40,11 @@ export default defineComponent({
     border-radius: 10px;
     color: white;
     text-transform: uppercase;
+    font-size: 60%;
 }
 .cartao p {
     position: absolute;
+    font-size: 2em;
 }
 #text-titular {
     bottom: 20px;
@@ -49,5 +54,12 @@ export default defineComponent({
     bottom: 50px;
     left: 10px;
     letter-spacing: 4px;
+}
+
+.issuer {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 15%;
 }
 </style>

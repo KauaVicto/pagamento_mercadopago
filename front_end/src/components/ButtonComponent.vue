@@ -1,5 +1,5 @@
 <template>
-    <button>{{ text_button }}</button>
+    <input :type="type_button" :value="text_button">
 </template>
 
 <script lang="ts">
@@ -8,13 +8,22 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: "ButtonComponent",
-    props: ['text_button']
+    props: {
+        text_button: {
+            type: String,
+            default: ''
+        },
+        type_button: {
+            type: String,
+            default: 'button'
+        }
+    }
 });
 
 </script>
 
 <style scoped>
-button {
+input {
     padding: 10px;
     background-color: #2f96f0;
     border: none;
