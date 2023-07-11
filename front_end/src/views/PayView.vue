@@ -19,9 +19,10 @@
 
         <div class="tab2" v-show="showTab == 2">
           <InputField type_input="text" id_input="form-checkout__cardNumber"
-            v-on:keyup="keyPressCardNumber($event.target.value)" v-model="cardNumber" />
+            v-on:keyup="keyPressCardNumber($event.target.value)"
+            @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" />
           <div class="form-group">
-            <InputField type_input="text" id_input="form-checkout__expirationDate" />
+            <InputField type_input="text" id_input="form-checkout__expirationDate" v-model="expirationDate" />
             <InputField type_input="text" id_input="form-checkout__securityCode" />
           </div>
           <select id="form-checkout__issuer"></select>
@@ -68,7 +69,8 @@ export default defineComponent({
       showTab: 1,
       cardholderName: '',
       cardNumber: '',
-      issuer: null,
+      expirationDate: '',
+      issuer: '',
       public_key: 'TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78'
     }
   },
@@ -200,7 +202,7 @@ export default defineComponent({
             })
         }
       } else {
-        this.issuer = null
+        this.issuer = ''
       }
     }
   }
@@ -320,11 +322,12 @@ select {
   display: block;
 }
 
-.cartao {
+.container .info_cartao {
   grid-area: cartao;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: stretch;
+  align-items: center;
+  background-color: transparent;
 }
 </style>
