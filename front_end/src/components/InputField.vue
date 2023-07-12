@@ -1,12 +1,13 @@
 <template>
     <div class="box-input" v-bind:class="{ 'foco': focused }">
-        <input :type="type_input" :id="id_input" :value="modelValue" @input="updateModel($event.target.value)"
-            v-on:focus="focused = true" v-on:blur="handleBlur"> 
+        <input :type="type_input" :id="id_input" :value="modelValue" v-on:keyup="updateModel($event)"
+            v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="'cardNumber'">
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { maskNumberCard } from '@/utils/maskInput'
 
 
 export default defineComponent({
@@ -17,7 +18,7 @@ export default defineComponent({
         }
     },
     props: {
-        id_input: String, 
+        id_input: String,
         type_input: String,
         modelValue: String
     },
@@ -25,13 +26,31 @@ export default defineComponent({
         handleBlur() {
             if (!this.modelValue)
                 return false
-            
+
             if (this.modelValue.length == 0) {
                 this.focused = false
             }
         },
-        updateModel(value: any) {
-            this.$emit('update:modelValue', value)
+        updateModel(e:any) {
+            this.$emit('update:modelValue', e.target.value)
+        }
+    },
+    directives: {
+        mascara: {
+            mounted(el, binding) {
+                const regex = binding.value;
+                const inputHandler = (e: any) => {
+                    switch (regex) {
+                        case 'cardNumber':
+                            e.target.value = maskNumberCard(e.target.value)
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                }
+                el.addEventListener('input', inputHandler);
+            }
         }
     }
 });
