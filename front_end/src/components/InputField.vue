@@ -25,7 +25,9 @@ export default defineComponent({
     },
     methods: {
         handleBlur() {
-            if (!this.modelValue)
+
+            
+            if (this.modelValue == null)
                 return false
 
             if (this.modelValue.length == 0) {

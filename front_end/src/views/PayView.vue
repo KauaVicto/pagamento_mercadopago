@@ -20,7 +20,7 @@
         <div class="tab2" v-show="showTab == 2">
           <InputField type_input="text" id_input="form-checkout__cardNumber" 
             v-on:keyup="keyPressCardNumber($event.target.value)"
-            @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" />
+            @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" mask_input="cardNumber" />
           <div class="form-group">
             <InputField type_input="text" id_input="form-checkout__expirationDate" v-model="expirationDate" />
             <InputField type_input="text" id_input="form-checkout__securityCode" />
@@ -33,7 +33,7 @@
       </div>
 
       <div class="info_cartao">
-        <CartaoComponent :titular="cardholderName" :numero_cartao="formatCardNumber(cardNumber)" :issuer="issuer" />
+        <CartaoComponent :titular="cardholderName" :numero_cartao="cardNumber" :issuer="issuer" />
       </div>
 
       <div class="info_compras">
@@ -184,16 +184,12 @@ export default defineComponent({
     proximaEtapa: function (e: any) {
       this.showTab = 2
     },
-    formatCardNumber: function (number: string) {
-      if (!number) return '';
-
-      return number.replace(/(.{4})/g, '$1 ')
-    },
     keyPressCardNumber: function (value: string) {
-      if (value.length >= 6) {
+      let valueNumber = value.replace(' ', '');
+      if (valueNumber.length >= 6) {
         if (!this.issuer) {
 
-          axios.get('https://api.mercadopago.com/v1/payment_methods/installments', { params: { public_key: this.public_key, bin: value, amount: 1000 } })
+          axios.get('https://api.mercadopago.com/v1/payment_methods/installments', { params: { public_key: this.public_key, bin: valueNumber, amount: 1000 } })
             .then((response) => {
               this.issuer = response.data[0].payment_method_id;
             })

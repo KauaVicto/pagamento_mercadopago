@@ -1,5 +1,5 @@
 <template>
-    <div class="cartao" :class="{ 'master': issuer == 'master', 'visa': issuer == 'visa' }">
+    <div class="cartao" v-on:mouseover="console.log(numero_cartao)" :class="{ 'master': issuer == 'master', 'visa': issuer == 'visa' }">
         <p id="text-titular">{{ titular.length > 0 ? titular : 'NOME DO TITULAR' }}</p>
         <p id="numero-cartao">{{ numero_cartao.length > 0 ? numero_cartao : '**** **** **** ****' }}</p>
         <p id="validade-cartao">{{ validade_cartao.length > 0 ? validade_cartao : '**/**' }}</p>
