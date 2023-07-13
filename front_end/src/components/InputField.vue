@@ -1,13 +1,13 @@
 <template>
     <div class="box-input" v-bind:class="{ 'foco': focused }">
         <input :type="type_input" :id="id_input" :value="modelValue" v-on:keyup="updateModel($event)"
-            v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="'cardNumber'">
+            v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="mask_input">
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { maskNumberCard } from '@/utils/maskInput'
+import { maskNumberCard, maskCpf } from '@/utils/maskInput'
 
 
 export default defineComponent({
@@ -20,7 +20,8 @@ export default defineComponent({
     props: {
         id_input: String,
         type_input: String,
-        modelValue: String
+        modelValue: String,
+        mask_input: String
     },
     methods: {
         handleBlur() {
@@ -43,6 +44,10 @@ export default defineComponent({
                     switch (regex) {
                         case 'cardNumber':
                             e.target.value = maskNumberCard(e.target.value)
+                            break;
+
+                        case 'cpf':
+                            e.target.value = maskCpf(e.target.value)
                             break;
                     
                         default:

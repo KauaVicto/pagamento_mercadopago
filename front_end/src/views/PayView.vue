@@ -13,12 +13,12 @@
           <InputField type_input="text" id_input="form-checkout__cardholderName" v-model="cardholderName" />
           <InputField type_input="email" id_input="form-checkout__cardholderEmail" />
           <select id="form-checkout__identificationType"></select>
-          <InputField type_input="text" id_input="form-checkout__identificationNumber" />
+          <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf" />
           <ButtonComponent class="btn-proximo" text_button="Próximo" v-on:click="proximaEtapa" />
         </div>
 
         <div class="tab2" v-show="showTab == 2">
-          <InputField type_input="text" id_input="form-checkout__cardNumber"
+          <InputField type_input="text" id_input="form-checkout__cardNumber" 
             v-on:keyup="keyPressCardNumber($event.target.value)"
             @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" />
           <div class="form-group">
@@ -82,7 +82,7 @@ export default defineComponent({
   methods: {
     configCardForm: (mp: any) => {
       const cardForm = mp.cardForm({
-        amount: "20",
+        amount: "10",
         iframe: false,
         form: {
           id: "form-checkout",
@@ -193,7 +193,7 @@ export default defineComponent({
       if (value.length >= 6) {
         if (!this.issuer) {
 
-          axios.get('https://api.mercadopago.com/v1/payment_methods/installments', { params: { public_key: this.public_key, bin: value } })
+          axios.get('https://api.mercadopago.com/v1/payment_methods/installments', { params: { public_key: this.public_key, bin: value, amount: 1000 } })
             .then((response) => {
               this.issuer = response.data[0].payment_method_id;
             })
