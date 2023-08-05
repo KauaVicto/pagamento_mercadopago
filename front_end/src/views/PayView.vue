@@ -11,14 +11,14 @@
 
         <div class="tab1" v-show="showTab == 1">
           <InputField type_input="text" id_input="form-checkout__cardholderName" v-model="cardholderName" />
-          <InputField type_input="email" id_input="form-checkout__cardholderEmail" />
-          <select id="form-checkout__identificationType"></select>
-          <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf" />
+          <InputField type_input="email" id_input="form-checkout__cardholderEmail" v-model="cardholderEmail" />
+          <select id="form-checkout__identificationType" v-model="identificationType"></select>
+          <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf" v-model="identificationNumber" />
           <ButtonComponent class="btn-proximo" text_button="Próximo" v-on:click="proximaEtapa" />
         </div>
 
         <div class="tab2" v-show="showTab == 2">
-          <InputField type_input="text" id_input="form-checkout__cardNumber" 
+          <InputField type_input="text" id_input="form-checkout__cardNumber"
             v-on:keyup="keyPressCardNumber($event.target.value)"
             @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" mask_input="cardNumber" />
           <div class="form-group">
@@ -70,6 +70,9 @@ export default defineComponent({
       cardholderName: '',
       cardNumber: '',
       expirationDate: '',
+      cardholderEmail: '',
+      identificationNumber: '',
+      identificationType: '',
       issuer: '',
       public_key: 'TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78'
     }

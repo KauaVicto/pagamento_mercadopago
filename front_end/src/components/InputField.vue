@@ -1,6 +1,6 @@
 <template>
     <div class="box-input" v-bind:class="{ 'foco': focused }">
-        <input :type="type_input" :id="id_input" :value="modelValue" v-on:keyup="updateModel($event)"
+        <input :type="type_input" :id="id_input" :value="modelValue" @input="updateModel($event)"
             v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="mask_input">
     </div>
 </template>
@@ -26,7 +26,6 @@ export default defineComponent({
     methods: {
         handleBlur() {
 
-            
             if (this.modelValue == null)
                 return false
 
