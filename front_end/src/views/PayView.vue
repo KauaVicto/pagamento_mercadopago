@@ -1,48 +1,51 @@
 <template>
   <form id="form-checkout">
     <div class="container">
-      <div class="tabs">
-        <ul class="list_tab" v-bind:class="{ 'active1': showTab == 1, 'active2': showTab == 2 }">
-          <li id="tab_info_pessoal" v-on:click="showTab = 1">Informações Pessoais</li>
-          <li id="tab_info_cartao" v-on:click="showTab = 2">Informações do Cartão</li>
-        </ul>
-      </div>
-      <div class="form_pagamento">
-
-        <div class="tab1" v-show="showTab == 1">
-          <InputField type_input="text" id_input="form-checkout__cardholderName" v-model="cardholderName" />
-          <InputField type_input="email" id_input="form-checkout__cardholderEmail" v-model="cardholderEmail" />
-          <select id="form-checkout__identificationType" v-model="identificationType"></select>
-          <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf" v-model="identificationNumber" />
-          <ButtonComponent class="btn-proximo" text_button="Próximo" v-on:click="proximaEtapa" />
+      <div class="form">
+        <div class="tabs">
+          <ul class="list_tab" v-bind:class="{ 'active1': showTab == 1, 'active2': showTab == 2 }">
+            <li id="tab_info_pessoal" v-on:click="showTab = 1">Informações Pessoais</li>
+            <li id="tab_info_cartao" v-on:click="showTab = 2">Informações do Cartão</li>
+          </ul>
         </div>
 
-        <div class="tab2" v-show="showTab == 2">
-          <InputField type_input="text" id_input="form-checkout__cardNumber"
-            v-on:keyup="keyPressCardNumber($event.target.value)"
-            @keydown.ctrl.86="keyPressCardNumber($event.target.value)" v-model="cardNumber" mask_input="cardNumber" />
-          <div class="form-group">
-            <InputField type_input="text" id_input="form-checkout__expirationDate" v-model="expirationDate" />
-            <InputField type_input="text" id_input="form-checkout__securityCode" />
+        <div class="form_card">
+          <div class="form_pagamento">
+            <div class="tab1" v-show="showTab == 1">
+              <InputField type_input="text" id_input="form-checkout__cardholderName" v-model="cardholderName" />
+              <InputField type_input="email" id_input="form-checkout__cardholderEmail" v-model="cardholderEmail" />
+              <select id="form-checkout__identificationType" v-model="identificationType"></select>
+              <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf"
+                v-model="identificationNumber" />
+              <ButtonComponent class="btn-proximo" text_button="Próximo" v-on:click="proximaEtapa" />
+            </div>
+            <div class="tab2" v-show="showTab == 2">
+              <InputField type_input="text" id_input="form-checkout__cardNumber"
+                v-on:keyup="keyPressCardNumber($event.target.value)" @paste="keyPressCardNumber($event.target.value)"
+                v-model="cardNumber" mask_input="cardNumber" />
+              <div class="form-group">
+                <InputField type_input="text" id_input="form-checkout__expirationDate" v-model="expirationDate"
+                  mask_input="date" />
+                <InputField type_input="text" id_input="form-checkout__securityCode" v-model="securityCode"
+                  max_length="3" />
+              </div>
+              <select id="form-checkout__issuer"></select>
+              <select id="form-checkout__installments"></select>
+            </div>
           </div>
-          <select id="form-checkout__issuer"></select>
-          <select id="form-checkout__installments"></select>
+          <div class="card">
+            <CardComponent :titular="cardholderName" :numero_cartao="cardNumber" :issuer="issuer"
+              :expiration_date="expirationDate" :security_code="securityCode" />
+          </div>
         </div>
-
-
-      </div>
-
-      <div class="info_cartao">
-        <CartaoComponent :titular="cardholderName" :numero_cartao="cardNumber" :issuer="issuer" />
       </div>
 
       <div class="info_compras">
-
+        <p>{{ productAmount }}</p>
 
         <button type="submit" id="form-checkout__submit">Pagar</button>
 
       </div>
-
 
     </div>
   </form>
@@ -55,37 +58,56 @@ import axiosInstance from "@/config/axios";
 import axios from "axios";
 import InputField from "@/components/InputField.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
-import CartaoComponent from "@/components/CartaoComponent.vue";
+import CardComponent from "@/components/CardComponent.vue";
+import { useStore } from 'vuex';
 
 export default defineComponent({
   name: "PayView",
   components: {
     InputField,
     ButtonComponent,
-    CartaoComponent
+    CardComponent
   },
   data() {
     return {
       showTab: 1,
+      productId: '',
+      productAmount: 0,
+      productName: '',
       cardholderName: '',
       cardNumber: '',
       expirationDate: '',
       cardholderEmail: '',
-      identificationNumber: '',
-      identificationType: '',
+      identificationNumber: '65603410035',
+      identificationType: 'CPF',
       issuer: '',
-      public_key: 'TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78'
+      securityCode: '',
+      public_key: ''
     }
   },
   async mounted() {
+    const store = useStore();
     await loadMercadoPago();
-    const mp = new window.MercadoPago(this.public_key);
-    this.configCardForm(mp);
+
+    // buscar produto
+    axiosInstance.get(`/product/findById/${this.$route.params.id}`)
+      .then((response) => {
+        store.commit('setProduct', response.data);
+        this.productAmount = response.data.valor;
+        this.productName = response.data.nome;
+        this.productId = response.data.id;
+
+        const mp = new window.MercadoPago(this.public_key);
+        this.configCardForm(mp);
+      })
+      .catch((error) => {
+        console.log(error)
+      });
   },
   methods: {
-    configCardForm: (mp: any) => {
+    configCardForm(mp: any) {
       const cardForm = mp.cardForm({
-        amount: "10",
+        amount: `${this.productAmount}`,
         iframe: false,
         form: {
           id: "form-checkout",
@@ -146,24 +168,28 @@ export default defineComponent({
               identificationNumber,
               identificationType,
             } = cardForm.getCardFormData();
+            console.table(cardForm.getCardFormData())
 
-            axiosInstance.post(
-              "/process_payment",
+            axiosInstance.post("/payment/process_payment",
               JSON.stringify({
-                token,
-                issuer_id,
-                payment_method_id,
-                transaction_amount: Number(amount),
-                installments: Number(installments),
-                description: "Descrição do produto",
-                payer: {
-                  email,
-                  identification: {
-                    type: identificationType,
-                    number: identificationNumber,
-                  },
-                },
-              }),
+                productId: this.productId,
+                paymentForm: {
+                  token,
+                  issuer_id,
+                  payment_method_id,
+                  transaction_amount: Number(amount),
+                  installments: Number(installments),
+                  description: this.productName,
+                  payer: {
+                    email,
+                    identification: {
+                      type: identificationType,
+                      number: identificationNumber,
+                    },
+                  }
+                }
+              }
+              ),
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -171,7 +197,7 @@ export default defineComponent({
               }
             )
               .then((response: any) => {
-
+                console.log(response)
               })
               .catch((error: any) => {
                 console.log(error)
@@ -188,7 +214,7 @@ export default defineComponent({
       this.showTab = 2
     },
     keyPressCardNumber: function (value: string) {
-      let valueNumber = value.replace(' ', '');
+      let valueNumber = value.replace(/ /g, '');
       if (valueNumber.length >= 6) {
         if (!this.issuer) {
 
@@ -219,34 +245,54 @@ export default defineComponent({
 
 .container {
   width: 90%;
-  min-width: 700px;
   max-width: 1100px;
   height: 60vh;
   min-height: 400px;
-  display: grid;
-  justify-content: center;
-  gap: 10px;
-  grid-template:
-    "tabs tabs info_compras" 20%
-    "form_pagamento cartao info_compras" auto
-    / 40% 30% 25%
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  align-items: initial;
 }
 
 .container>div {
   border-radius: 10px;
-  background-color: white;
+  background-color: rgb(46, 42, 42);
 }
 
-.tabs {
-  grid-area: tabs;
+.card {
+  max-width: 400px;
 }
 
-.info_compras {
-  grid-area: info_compras;
+.container .form {
+  flex: 2;
 }
 
-.form_pagamento {
-  grid-area: form_pagamento;
+.container .info_compras {
+  flex: 1;
+}
+
+.form .tabs {
+  height: 80px;
+  margin-bottom: 20px;
+  font-size: .9rem;
+  text-align: center;
+}
+
+
+.form .form_card {
+  display: flex;
+  justify-content: space-around;
+  align-items: start;
+  gap: 30px;
+
+}
+
+.form .form_card>div {
+  width: 45%;
+}
+
+.form {
+  height: 450px;
 }
 
 .list_tab {
@@ -266,7 +312,7 @@ export default defineComponent({
   bottom: 0;
   width: 50%;
   height: 2px;
-  background-color: #087bdf;
+  background-color: #035ead;
   transition: .5s ease-in-out;
 }
 
@@ -297,6 +343,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: stretch;
   padding: 10px;
+  height: 300px;
 }
 
 .btn-proximo {
@@ -310,7 +357,6 @@ export default defineComponent({
   align-items: center;
 }
 
-input,
 select {
   padding: 10px;
   width: 100%;
@@ -319,14 +365,36 @@ select {
   outline: none;
   position: relative;
   display: block;
+  background-color: rgba(56, 52, 52, 0.719);
 }
 
-.container .info_cartao {
-  grid-area: cartao;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
+@media screen and (max-width: 1220px) {
+  .container {
+    flex-direction: column-reverse;
+    justify-content: space-evenly;
+    width: 80vw;
+  }
+
+  .form {
+    height: 850px;
+  }
+
+  .form .tabs {
+    margin: 0;
+  }
+
+  .form .form_card {
+    flex-direction: column;
+    padding: 20px 10px;
+  }
+
+  .form .form_card>div {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .card {
+    display: none;
+  }
 }
 </style>

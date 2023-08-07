@@ -25,7 +25,7 @@ export default defineComponent({
 <style scoped>
 input {
     padding: 10px;
-    background-color: #2f96f0;
+    background-color: #1c6bb1;
     border: none;
     border-radius: 5px;
     color: white;
@@ -35,7 +35,7 @@ input {
     cursor: pointer;
 }
 
-button:hover {
-    background-color: #156fbe;
+input:hover {
+    background-color: #0d4777;
 }
 </style>

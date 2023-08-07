@@ -1,13 +1,13 @@
 <template>
     <div class="box-input" v-bind:class="{ 'foco': focused }">
         <input :type="type_input" :id="id_input" :value="modelValue" @input="updateModel($event)"
-            v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="mask_input">
+            v-on:focus="focused = true" v-on:blur="handleBlur" v-mascara="mask_input" :maxlength="max_length ? parseInt(max_length) : ''">
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { maskNumberCard, maskCpf } from '@/utils/maskInput'
+import { maskNumberCard, maskCpf, maskDate } from '@/utils/maskInput'
 
 
 export default defineComponent({
@@ -18,10 +18,25 @@ export default defineComponent({
         }
     },
     props: {
-        id_input: String,
-        type_input: String,
-        modelValue: String,
-        mask_input: String
+        id_input: {
+            type: String,
+            default: ''
+        },
+        type_input: {
+            type: String,
+            default: ''
+        },
+        modelValue: {
+            type: String,
+            default: ''
+        },
+        mask_input: {
+            type: String,
+            default: ''
+        },
+        max_length: {
+            type: String,
+        }
     },
     methods: {
         handleBlur() {
@@ -51,11 +66,15 @@ export default defineComponent({
                             e.target.value = maskCpf(e.target.value)
                             break;
                     
+                        case 'date':
+                            e.target.value = maskDate(e.target.value)
+                            break;
+
                         default:
                             break;
                     }
                 }
-                el.addEventListener('input', inputHandler);
+                el.addEventListener('input', inputHandler, true);
             }
         }
     }
@@ -82,7 +101,7 @@ export default defineComponent({
 }
 
 .box-input.foco input {
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(56, 52, 52);
 }
 
 .box-input.foco::after {
@@ -97,7 +116,7 @@ export default defineComponent({
     outline: none;
     position: relative;
     display: block;
-    background-color: white;
+    background-color: rgba(56, 52, 52, 0.719);
     transition: .3s all ease-in-out;
     border-radius: 5px 5px 0 0;
     text-transform: uppercase;

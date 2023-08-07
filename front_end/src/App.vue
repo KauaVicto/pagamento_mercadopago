@@ -8,8 +8,10 @@
 * {
   font-family: Montserrat;
   box-sizing: border-box;
+  color: white;
 }
 body {
-  background-color: rgb(240, 240, 240);
+  background-color: rgb(74, 75, 78);
+  overflow-x: hidden;
 }
 </style>
