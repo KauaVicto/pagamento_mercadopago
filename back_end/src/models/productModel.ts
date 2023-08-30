@@ -8,7 +8,7 @@ const products: ProductDTO[] = [
     {
         id: 'fasdui2rufh2387r',
         nome: 'PS5',
-        valor: 1
+        valor: 3000
     }
 ]
 

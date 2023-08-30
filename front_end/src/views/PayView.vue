@@ -15,8 +15,7 @@
               <InputField type_input="text" id_input="form-checkout__cardholderName" v-model="cardholderName" />
               <InputField type_input="email" id_input="form-checkout__cardholderEmail" v-model="cardholderEmail" />
               <select id="form-checkout__identificationType" v-model="identificationType"></select>
-              <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf"
-                v-model="identificationNumber" />
+              <InputField type_input="text" id_input="form-checkout__identificationNumber" mask_input="cpf" />
               <ButtonComponent class="btn-proximo" text_button="Próximo" v-on:click="proximaEtapa" />
             </div>
             <div class="tab2" v-show="showTab == 2">
@@ -41,7 +40,9 @@
       </div>
 
       <div class="info_compras">
-        <p>{{ productAmount }}</p>
+        <h2>Resumo da compra</h2>
+        <h4>Produto: {{ productName }}</h4>
+        <h4>Valor: {{ productAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h4>
 
         <button type="submit" id="form-checkout__submit">Pagar</button>
 
@@ -73,13 +74,13 @@ export default defineComponent({
       showTab: 1,
       productId: '',
       productAmount: 0,
+      productAmounttotal: 0,
       productName: '',
       cardholderName: '',
       cardNumber: '',
       expirationDate: '',
       cardholderEmail: '',
-      identificationNumber: '65603410035',
-      identificationType: 'CPF',
+      identificationType: '',
       issuer: '',
       securityCode: '',
       public_key: ''
@@ -197,16 +198,14 @@ export default defineComponent({
               }
             )
               .then((response: any) => {
-                console.log(response)
-              })
-              .catch((error: any) => {
-                console.log(error)
+                console.log(response);
+                alert('pagamento feito com sucesso')
               });
           },
           onFetching: (resource: any) => {
             // Buscando
             console.log('buscando')
-          },
+          }
         },
       });
     },
@@ -269,6 +268,11 @@ export default defineComponent({
 
 .container .info_compras {
   flex: 1;
+  padding: 5px 20px;
+}
+
+.container .info_compras h2 {
+  text-align: center;
 }
 
 .form .tabs {
@@ -355,6 +359,14 @@ export default defineComponent({
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+#form-checkout__submit {
+  padding: 10px;
+  background-color: #035ead;
+  border: none;
+  border-radius: 20px;
+  width: 100%;
 }
 
 select {
