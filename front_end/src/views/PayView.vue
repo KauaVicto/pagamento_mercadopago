@@ -83,7 +83,7 @@ export default defineComponent({
       identificationType: '',
       issuer: '',
       securityCode: '',
-      public_key: ''
+      public_key: 'TEST-bab0e354-1ea9-48d1-abab-db8ebb513f78'
     }
   },
   async mounted() {
